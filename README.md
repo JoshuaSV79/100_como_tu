@@ -34,7 +34,7 @@ El script registra el nombre y el SHA-256 de cada ZIP dentro de `datos.js` (`met
 ## Incrustarlo en otro sitio
 
 ```html
-<iframe src="https://URL-DONDE-SE-ALOJE/" title="100 como tú: participación ciudadana"
+<iframe src="https://joshuasv79.github.io/100_como_tu/" title="100 como tú: participación ciudadana"
         width="100%" height="1100" style="border:0" loading="lazy"></iframe>
 ```
 
