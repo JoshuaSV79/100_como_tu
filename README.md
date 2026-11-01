@@ -42,12 +42,6 @@ El script registra el nombre y el SHA-256 de cada ZIP dentro de `datos.js` (`met
 
 Editar solo las variables del bloque `:root` de `styles.css`. Los valores actuales son aproximaciones de la paleta institucional (gris, beige, blanco y negro); sustituirlos por los del manual de identidad vigente.
 
-## Publicar en GitHub Pages
-
-1. Crear un repositorio público y subir estos archivos en la raíz.
-2. Settings → Pages → Branch: `main` / carpeta `/ (root)` → Save.
-3. La dirección queda como `https://USUARIO.github.io/REPOSITORIO/`. Abrirla en una ventana de incógnito para verificar.
-
 ## Accesibilidad
 
 Contraste AA, navegación completa con teclado (el arrastre es opcional: cada opción también se elige con un toque), alternativa textual para cada gráfica y tabla equivalente, tema claro y oscuro, y respeto a `prefers-reduced-motion`.
