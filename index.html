@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>100 como tú · La participación ciudadana en datos</title>
+  <meta name="description" content="De cada 100 personas como tú, ¿cuántas participaron? Apuesta, descubre y compara con datos de participación ciudadana del INE, 2009-2024.">
+  <meta name="theme-color" content="#2B2F36">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="https://tableau.ine.mx/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+</head>
+<body>
+  <a class="skip" href="#explora">Saltar al explorador</a>
+
+  <!-- Sprite de la figura humana (se reutiliza en las 100 figuras y en el avatar) -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="person" viewBox="0 0 24 40">
+      <circle cx="12" cy="7" r="5"></circle>
+      <path d="M5 15h14a3 3 0 0 1 3 3v9h-3.5v11H14v-9h-4v9H5.5V27H2v-9a3 3 0 0 1 3-3z"></path>
+    </symbol>
+  </svg>
+
+  <header class="top">
+    <div class="wrap top-in">
+      <p class="brand"><svg class="brand-fig" viewBox="0 0 24 40" aria-hidden="true"><use href="#person"></use></svg>100 como tú</p>
+      <nav aria-label="Secciones">
+        <a href="#explora">Explora</a>
+        <a href="#historias">Historias</a>
+        <a href="#metodo">Método</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="banner-ejemplo" class="banner" role="note" hidden>
+    <strong>Datos de ejemplo.</strong> Las cifras que ves ahora son sintéticas y no corresponden al INE.
+  </div>
+
+  <main>
+    <!-- HERO: la cifra nacional recorre las seis elecciones y se detiene en la última -->
+    <section class="hero" aria-labelledby="t-hero">
+      <div class="wrap hero-in">
+        <div class="hero-txt">
+          <p class="kicker">Participación ciudadana · INE · 2009-2024</p>
+          <h1 id="t-hero">De cada 100 personas <em>como tú</em>, ¿cuántas participaron?</h1>
+          <p class="lead">Cada figura es una persona. Las que se iluminan, votaron. Descubre qué pasa con las de tu edad, tu sexo registrado y tu entidad.</p>
+          <a class="btn cta" href="#explora">Encuentra a tu grupo <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-stage">
+          <div id="hero-grid" class="grid100" aria-hidden="true"></div>
+          <p class="hero-cap" id="hero-cap">En México, <b id="hero-n">–</b> de cada 100 personas participaron en la elección <span id="hero-tipo"></span> de <b id="hero-year">–</b>.</p>
+          <p class="hero-years" id="hero-years" aria-hidden="true"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="explora" class="wrap app" aria-label="Explorador de participación">
+
+      <!-- 1. Tú -->
+      <div class="panel yo" id="yo">
+        <h2><span class="num">1</span> Elige a quién te pareces</h2>
+        <p class="hint">Arrastra al monito sobre una opción, o toca la opción directamente.</p>
+        <div class="tray" id="tray">
+          <div id="avatar" class="avatar" aria-hidden="true">
+            <svg class="fig-av" viewBox="0 0 24 40"><use href="#person"></use></svg>
+          </div>
+          <span class="bubble" aria-hidden="true">¡Arrástrame!</span>
+          <p id="grupo-label" class="grupo"></p>
+        </div>
+        <fieldset>
+          <legend>Edad</legend>
+          <div id="chips-edad" class="chips"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Sexo registrado</legend>
+          <div id="chips-sexo" class="chips"></div>
+        </fieldset>
+        <label for="sel-ent" class="lbl-ent">Entidad</label>
+        <select id="sel-ent"></select>
+      </div>
+
+      <!-- 2. Apuesta y resultado -->
+      <div class="panel stage" id="stage" data-mode="bet">
+        <h2><span class="num">2</span> Apuesta y descubre</h2>
+        <div class="stage-head">
+          <span id="badge" class="badge"></span>
+          <p id="frase" class="frase" aria-live="polite"></p>
+        </div>
+
+        <div class="bet only-bet" id="bet">
+          <label for="guess" class="bet-l">Antes de ver el dato, ¿cuántas de estas 100 personas crees que participaron?</label>
+          <div class="bet-row">
+            <input id="guess" type="range" min="0" max="100" step="1" value="50">
+            <output id="guess-out" for="guess"></output>
+          </div>
+          <div class="acciones">
+            <button id="btn-reveal" type="button" class="btn">Revelar el dato</button>
+            <button id="btn-skip" type="button" class="btn link">Ver el dato directo</button>
+          </div>
+        </div>
+
+        <p class="big"><span id="big">–</span><span class="de100">de 100</span><span id="big-tag" class="big-tag"></span></p>
+        <div id="grid" class="grid100" aria-hidden="true"></div>
+        <p id="verdict" class="verdict only-reveal" hidden></p>
+        <p id="detalle" class="detalle only-reveal"></p>
+
+        <div id="comparar" class="comparar only-reveal" hidden>
+          <h3>Comparado con el grupo fijado</h3>
+          <p id="frase2" class="frase2"></p>
+          <div id="grid2" class="grid100 mini" aria-hidden="true"></div>
+          <p id="brecha" class="detalle"></p>
+        </div>
+
+        <div class="acciones only-reveal">
+          <button id="btn-card" type="button" class="btn">Generar tarjeta para compartir</button>
+          <button id="btn-pin" type="button" class="btn sec">Fijar este grupo para comparar</button>
+          <button id="btn-unpin" type="button" class="btn sec" hidden>Quitar comparación</button>
+          <button id="btn-rebet" type="button" class="btn link">Apostar de nuevo</button>
+        </div>
+
+        <figure id="tarjeta-prev" class="tarjeta-prev" hidden>
+          <img id="tarjeta-img" alt="">
+          <figcaption>Tu tarjeta. Si no se descargó sola, mantén presionada la imagen para guardarla.</figcaption>
+        </figure>
+
+        <h3 class="sub">Elección</h3>
+        <div id="anios" class="chips" role="group" aria-label="Año de la elección"></div>
+        <button id="btn-play" type="button" class="btn sec play">▶ Reproducir el tiempo</button>
+      </div>
+
+      <!-- 3. Mapa y tendencia -->
+      <div class="panel mapa">
+        <h2><span class="num">3</span> Tu entidad en el país</h2>
+        <p class="hint">Cada entidad mide lo mismo para no dar más peso visual a las más grandes. No es un mapa a escala.</p>
+        <div id="tiles" class="tiles" role="group" aria-label="Mapa de cuadros de las 32 entidades"></div>
+        <div class="legend" aria-hidden="true">
+          <span id="leg-min"></span>
+          <i class="sw sw0"></i><i class="sw sw1"></i><i class="sw sw2"></i><i class="sw sw3"></i><i class="sw sw4"></i>
+          <span id="leg-max"></span>
+        </div>
+        <p class="hint">Colores relativos a este grupo y a esta elección.</p>
+
+        <h3 class="sub">Cómo cambia con el tiempo</h3>
+        <svg id="trend" class="trend" viewBox="0 0 360 230" role="img" aria-label="Gráfica de participación por elección"></svg>
+        <p class="hint">Las franjas marcan las elecciones presidenciales. Conviene comparar cada tipo con los de su misma clase.</p>
+        <details class="tabla">
+          <summary>Ver los datos de la gráfica en tabla</summary>
+          <table>
+            <thead><tr><th scope="col">Elección</th><th scope="col">Grupo actual</th><th scope="col">Grupo fijado</th></tr></thead>
+            <tbody id="tabla-body"></tbody>
+          </table>
+        </details>
+      </div>
+    </section>
+
+    <p id="estado" class="sr-only" role="status"></p>
+
+    <!-- Historias calculadas con los mismos datos -->
+    <section id="historias" class="wrap historias" aria-labelledby="t-hist">
+      <h2 id="t-hist">Lo que ya cuentan los datos</h2>
+      <p class="hint">Cada cifra de esta sección se calcula en tu navegador con la misma base. Toca una para verla en la cuadrícula. Son diferencias entre grupos, no explicaciones de sus causas.</p>
+      <div id="stories" class="stories"></div>
+    </section>
+
+    <section id="oficial" class="wrap oficial" aria-labelledby="t-oficial">
+      <h2 id="t-oficial">Compáralo con el tablero oficial del INE</h2>
+      <p class="hint">Las cifras de arriba salen de la Plataforma CCPC. Aquí puedes verificarlas en el tablero original.</p>
+      <!--TABLEAU-START-->
+      <div class="viz-wrap" id="viz-wrap">
+        <div class="viz-fb" id="viz-fb">
+          <p class="viz-fb-t"><b>Tablero oficial «Datos generales»</b></p>
+          <p>Cargando el tablero del INE… Si no aparece, tu navegador o red puede estar bloqueando contenido incrustado. Ábrelo directamente:</p>
+          <a class="btn" href="https://tableau.ine.mx/t/DECEYEC/views/Prototipo9/Datosgenerales?%3Aembed=y&amp;%3AisGuestRedirectFromVizportal=y" target="_blank" rel="noopener noreferrer">Abrir el tablero oficial</a>
+        </div>
+        <tableau-viz id="tableau-viz" src="https://tableau.ine.mx/t/DECEYEC/views/Prototipo9/Datosgenerales" width="100%" height="818" toolbar="bottom"></tableau-viz>
+      </div>
+      <!--TABLEAU-END-->
+      <p class="viz-link"><a href="https://tableau.ine.mx/t/DECEYEC/views/Prototipo9/Datosgenerales?%3Aembed=y&amp;%3AisGuestRedirectFromVizportal=y" target="_blank" rel="noopener noreferrer">Abrir el tablero oficial en una pestaña nueva</a></p>
+    </section>
+
+    <section id="metodo" class="wrap metodo" aria-labelledby="t-metodo">
+      <h2 id="t-metodo">Datos y método</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>De dónde vienen los datos</h3>
+          <p>Plataforma de los Conteos Censales de Participación Ciudadana (CCPC) 2009-2024 del Instituto Nacional Electoral. Son datos agregados y disociados: no contienen información de personas concretas.</p>
+          <p><a href="https://ine.mx/transparencia/datos-abiertos/visualizacion-datos/conteos-censales-participacion/" target="_blank" rel="noopener noreferrer">Consulta la plataforma oficial</a></p>
+          <p class="meta">Fuente en esta versión: <span id="m-fuente"></span>. Corte: <span id="m-corte"></span>.</p>
+        </article>
+        <article class="card">
+          <h3>Cómo se calcula</h3>
+          <p id="m-metrica"></p>
+          <p>Para dibujar las 100 figuras redondeamos al entero más cercano. El dato exacto aparece siempre debajo.</p>
+          <p>Si un grupo es demasiado pequeño, no lo mostramos para evitar conclusiones frágiles.</p>
+        </article>
+        <article class="card">
+          <h3>Cómo leerlo</h3>
+          <ul>
+            <li>Es el promedio de un grupo. No predice lo que hará una persona.</li>
+            <li>Habla de participación, nunca de preferencias: el voto es secreto.</li>
+            <li>Una diferencia entre grupos no explica sus causas.</li>
+            <li>Las elecciones presidenciales (2012, 2018, 2024) y las intermedias (2009, 2015, 2021) se comparan por separado.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Tu privacidad</h3>
+          <p>Esta página no usa cookies ni rastreadores propios y no guarda tu selección ni tu apuesta. La tarjeta se genera en tu dispositivo y no se sube a ningún servidor.</p>
+          <p>El tablero oficial se carga desde los servidores del INE y se rige por su aviso de privacidad.</p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p>Proyecto presentado al hackatón «Hackea la participación: datos que construyen democracia», Reto 3. Equipo INEvitables: Paola Montserrat Osorio García (representante) y Joshua Alexander Sierra Veloz.</p>
+      <p>Proyecto ciudadano. No representa la postura oficial del INE.</p>
+    </div>
+  </footer>
+
+  <!-- Barra fija en celular: muestra tu resultado mientras recorres el mapa -->
+  <div id="dock" class="dock" aria-hidden="true">
+    <span class="dock-n"><b id="dock-n">?</b><small> de 100</small></span>
+    <span id="dock-t" class="dock-t"></span>
+    <button id="dock-go" type="button" class="dock-go" tabindex="-1">Ver ↑</button>
+  </div>
+
+  <script src="datos.js"></script>
+  <script src="app.js"></script>
+  <script>
+    /* Oculta el aviso cuando el tablero del INE termina de cargar. */
+    (function(){var v=document.getElementById('tableau-viz'),w=document.getElementById('viz-wrap');
+      if(!v)return;
+      v.addEventListener('firstinteractive',function(){w.classList.add('ok');});
+      setTimeout(function(){if(!w.classList.contains('ok'))w.classList.add('late');},8000);})();
+  </script>
+</body>
+</html>
